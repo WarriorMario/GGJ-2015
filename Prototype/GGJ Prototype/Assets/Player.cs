@@ -9,8 +9,8 @@ public class Player : MonoBehaviour {
 
     CharacterController m_CharacterController;
     Vector3 m_MoveDirection;
-    string m_HorizontalInput = "Horizontal";
-    string m_VerticalInput = "Vertical";
+    string m_HorizontalInput = "Horizontal0";
+    string m_VerticalInput = "Vertical0";
     // Use this for initialization
     void Awake ()
     {
