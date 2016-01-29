@@ -31,11 +31,15 @@ public class Player : MonoBehaviour {
         {
             m_MoveDirection = new Vector3(0, 0, Input.GetAxis(m_VerticalInput)* m_YSpeed);
         }
+
 	}
 
     void FixedUpdate()
     {
-        transform.rotation = Quaternion.LookRotation(m_MoveDirection.normalized);
+        if(m_MoveDirection.x != 0 || m_MoveDirection.z != 0)
+        {
+            transform.rotation = Quaternion.LookRotation(m_MoveDirection.normalized);
+        }
         m_CharacterController.Move(m_MoveDirection);
     }
 }
