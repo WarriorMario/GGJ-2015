@@ -3,11 +3,12 @@ using System.Collections;
 
 public class Player : MonoBehaviour
 {
-
     public int m_Player;
     public float m_XSpeed;
     public float m_ZSpeed;
+
     public float m_PickupOffset;
+    public ProjectileSlot m_ProjectileSlot;
 
     CharacterController m_CharacterController;
     Vector3 m_FaceDirection;
@@ -25,6 +26,7 @@ public class Player : MonoBehaviour
         m_HorizontalInput += m_Player.ToString();
         m_VerticalInput += m_Player.ToString();
         m_PickupInput += m_Player.ToString();
+
         m_FaceDirection = Vector3.forward;
         m_MoveDirection = Vector3.zero;
     }
@@ -40,22 +42,41 @@ public class Player : MonoBehaviour
         {
             m_MoveDirection = new Vector3(0, 0, Input.GetAxis(m_VerticalInput) * m_ZSpeed);
         }
+
+        // Pickup.
+        if (Input.GetButtonDown(m_PickupInput))
+        {
+            if (m_LastHit != null)
+            {
+                m_LastHit.GetComponent<Rigidbody>().useGravity = true;
+                m_LastHit.GetComponent<BoxCollider>().enabled = false;
+                m_LastHit.transform.gameObject.GetComponent<MeshRenderer>().material.color = Color.white;
+                Destroy(m_LastHit, 5f);
+                m_LastHit = null;
+
+                m_ProjectileSlot.Fill();
+            }
+        }
     }
 
     void FixedUpdate()
     {
+        // Revert marked.
+        if (m_LastHit != null)
+            m_LastHit.transform.gameObject.GetComponent<MeshRenderer>().material.color = Color.white;
+
         if (m_MoveDirection.x != 0 || m_MoveDirection.z != 0)
         {
-            // Revert marked.
-            if (m_LastHit != null)
-                m_LastHit.transform.gameObject.GetComponent<MeshRenderer>().material.color = Color.white;
-
             m_FaceDirection = m_MoveDirection.normalized;
             transform.rotation = Quaternion.LookRotation(m_MoveDirection.normalized);
-
-            // Mark new.
-            MarkForwardBlock();
         }
+
+        // Mark new.
+        if (!m_ProjectileSlot.Filled)
+            MarkForwardBlock();
+        else
+            m_LastHit = null;
+
         m_CharacterController.Move(m_MoveDirection);
     }
 
