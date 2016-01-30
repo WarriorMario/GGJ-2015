@@ -8,12 +8,14 @@ public class Player : MonoBehaviour
     public int m_Player;
     public float m_XSpeed;
     public float m_ZSpeed;
+    public float m_ChargeTime = 1.0f;
+    public float m_ProjectileSpeed = 0.1f;
+    public float m_ProjectileHeight = 0.5f;
 
-    public float m_PickupOffset;
+    float m_PickupOffset;
     public ProjectileSlot m_ProjectileSlot;
     public GameObject m_BlockSelector;
     public GameObject m_GatherEffectPrefab;
-    public float m_TimerLimit = 1.0f;
 
     CharacterController m_CharacterController;
     Vector3 m_FaceDirection;
@@ -52,6 +54,8 @@ public class Player : MonoBehaviour
             }
             parent = parent.transform.parent.gameObject;
         }
+
+        m_PickupOffset = GetComponent<BoxCollider>().bounds.extents.x + 1.01f;
     }
 
     // Update is called once per frame
@@ -71,7 +75,7 @@ public class Player : MonoBehaviour
 
         GameObject marked = MarkForwardBlock();
         // Pickup.
-        if (marked != null && !m_ProjectileSlot.Filled&&m_Charging==false)
+        if (marked != null && !m_ProjectileSlot.Filled && m_Charging == false)
         {
             if (Input.GetButtonDown(m_PickupInput) && !m_PickingUp)
             {
@@ -87,7 +91,7 @@ public class Player : MonoBehaviour
         if (m_Charging)
         {
             m_Timer += Time.deltaTime;
-            if (m_Timer >= m_TimerLimit)
+            if (m_Timer >= m_ChargeTime)
             {
                 m_Timer = 0;
                 m_PickingUp = true;
@@ -178,7 +182,7 @@ public class Player : MonoBehaviour
             new Vector3(collider.center.x - collider.extents.x, collider.center.y, collider.center.z + collider.extents.z),
             new Vector3(collider.center.x + collider.extents.x, collider.center.y, collider.center.z - collider.extents.z)
         };
-
+        
         foreach (Vector3 position in positions)
         {
             if (Physics.Raycast(position, -transform.up, out hit, float.PositiveInfinity) == false)
