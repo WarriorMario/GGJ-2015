@@ -70,7 +70,13 @@ public class ProjectileController : MonoBehaviour
             Destroy(gameObject);
         }
         // Collision with a block.
-        if (other.CompareTag("Cube"))
+        RitualBlock ritualBlock = other.GetComponent<RitualBlock>();
+        if(ritualBlock)
+        {
+            ritualBlock.TakeDamage();
+            Destroy(gameObject);
+        }
+        else if (other.CompareTag("Cube"))
         {
             bool parentNotFound = true;
             GameObject parent = other.transform.parent.gameObject;

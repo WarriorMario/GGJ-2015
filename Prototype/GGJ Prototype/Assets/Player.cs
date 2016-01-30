@@ -126,9 +126,8 @@ public class Player : MonoBehaviour
     {
         if (Floating())
         {
-            gameObject.AddComponent<Rigidbody>().useGravity = true;
             GetComponent<Player>().enabled = false;
-            Destroy(gameObject, 10f);
+            Destroy(gameObject, 1f);
         }
         else
         {
@@ -191,7 +190,7 @@ public class Player : MonoBehaviour
             new Vector3(collider.center.x - collider.extents.x, collider.center.y, collider.center.z + collider.extents.z),
             new Vector3(collider.center.x + collider.extents.x, collider.center.y, collider.center.z - collider.extents.z)
         };
-        
+
         foreach (Vector3 position in positions)
         {
             if (Physics.Raycast(position, -transform.up, out hit, float.PositiveInfinity) == false)
