@@ -49,6 +49,11 @@ public class Platform : MonoBehaviour
         foreach (Player obj in m_Players)
         {
             GameObject block = obj.GetBlock();
+            if(block == null)
+            {
+                Debug.Log("Player is not ontop of anything this should never happen");
+                continue;
+            }
             int row = (int)(block.transform.position.z - transform.position.z);
             int col = (int)(block.transform.position.x - transform.position.x);
             if (visited[row, col] == false)
@@ -121,8 +126,23 @@ public class Platform : MonoBehaviour
             {
                 if (visited[y, x] == false)
                 {
-                    Destroy(m_Grid[y][x]);
+                    GameObject obj = m_Grid[y][x];
+                    if(obj)
+                    {
+                        obj.transform.GetChild(0).GetComponent<BlockHover>().enabled = false;
+                        obj.GetComponent<Rigidbody>().useGravity = true;
+                        obj.GetComponent<Rigidbody>().isKinematic = false;
+                        Destroy(obj, 10f);
+                    }
                 }
+            }
+        }
+        foreach (Transform t in transform)
+        {
+            Ritual ritual = t.GetComponent<Ritual>();
+            if (ritual)
+            {
+                ritual.OnBlockDestroy();
             }
         }
     }
@@ -132,9 +152,10 @@ public class Platform : MonoBehaviour
         int row = (int)(obj.transform.position.z - transform.position.z);
         int col = (int)(obj.transform.position.x - transform.position.x);
         // Destroy the block
-        obj.GetComponent<BlockHover>().enabled = false;
+        obj.transform.GetChild(0).GetComponent<BlockHover>().enabled = false;
         obj.GetComponent<Rigidbody>().useGravity = true;
-        Destroy(m_Grid[row][col], 5f);
+        obj.GetComponent<Rigidbody>().isKinematic = false;
+        Destroy(m_Grid[row][col], 10f);
         m_Grid[row][col] = null;
         // Call destroy event
         OnBlockDestroy();
@@ -146,7 +167,7 @@ public class Platform : MonoBehaviour
         foreach (Transform trans in transformForSearch.transform)
         {
             //Debug.Log (trans.name);
-            if (trans.tag.ToString() == "Cube")
+            if (trans.tag == "Cube")
             {
                 childs.Add(trans);
             }

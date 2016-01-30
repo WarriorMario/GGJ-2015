@@ -3,29 +3,33 @@ using System.Collections;
 
 public class ProjectileSlot : MonoBehaviour
 {
-    public GameObject m_ProjectilePrefab;
+    public ProjectileController m_ProjectilePrefab;
+    public OrbTracker m_OrbTrackerPrefab;
 
     GameObject m_Projectile;
-    public bool Filled
-    {
-        get { return m_Projectile != null; }
-    }
+    GameObject m_ActiveOrbTracker;
+    public bool Filled { get; set; }
 
     public void Fill()
     {
         if (!Filled)
         {
-            m_Projectile = Instantiate(m_ProjectilePrefab, transform.position, transform.rotation) as GameObject;
+            m_ActiveOrbTracker = Instantiate(m_OrbTrackerPrefab.gameObject, transform.position, transform.rotation) as GameObject;
+            m_Projectile = Instantiate(m_ProjectilePrefab.gameObject, transform.position, transform.rotation) as GameObject;
             m_Projectile.transform.parent = transform;
+
+            Filled = true;
         }
     }
     public void Fire(Vector3 target)
     {
         if (Filled)
         {
-            GameObject projectile = Instantiate(m_ProjectilePrefab, transform.position, transform.rotation) as GameObject;
-            projectile.GetComponent<ProjectileController>().Fire(target);
-            Destroy(m_Projectile);
+            m_Projectile.transform.parent = null;
+            m_Projectile.GetComponent<ProjectileController>().Fire(target);
+            m_ActiveOrbTracker.GetComponent<OrbTracker>().Initialize(m_Projectile);
+
+            Filled = false;
         }
     }
 }
