@@ -132,7 +132,9 @@ public class Platform : MonoBehaviour
         int row = (int)(obj.transform.position.z - transform.position.z);
         int col = (int)(obj.transform.position.x - transform.position.x);
         // Destroy the block
-        Destroy(m_Grid[row][col]);
+        obj.GetComponent<BlockHover>().enabled = false;
+        obj.GetComponent<Rigidbody>().useGravity = true;
+        Destroy(m_Grid[row][col], 5f);
         m_Grid[row][col] = null;
         // Call destroy event
         OnBlockDestroy();
