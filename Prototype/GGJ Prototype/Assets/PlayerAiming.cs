@@ -26,14 +26,7 @@ public class PlayerAiming : MonoBehaviour
 
     void Update()
     {
-        if (Mathf.Abs(Input.GetAxis(m_HorizontalInput)) > Mathf.Abs(Input.GetAxis(m_VerticalInput)))
-        {
-            m_MoveDirection = new Vector3(Input.GetAxis(m_HorizontalInput) * m_XSpeed, 0, 0);
-        }
-        else
-        {
-            m_MoveDirection = new Vector3(0, 0, Input.GetAxis(m_VerticalInput) * m_ZSpeed);
-        }
+        m_MoveDirection = new Vector3(Input.GetAxis(m_HorizontalInput) * m_XSpeed, 0, Input.GetAxis(m_VerticalInput) * m_ZSpeed);
 
         if (m_ProjectileSlot.Filled)
         {
@@ -48,13 +41,11 @@ public class PlayerAiming : MonoBehaviour
     {
         if (m_MoveDirection.x != 0 || m_MoveDirection.z != 0)
         {
-            transform.rotation = Quaternion.LookRotation(m_MoveDirection.normalized);
+            // Move the indicator.
+            float x = m_Indicator.transform.position.x + m_MoveDirection.x;
+            float y = m_Indicator.transform.position.y;
+            float z = m_Indicator.transform.position.z + m_MoveDirection.z;
+            m_Indicator.transform.position = new Vector3(x, y, z);
         }
-
-        // Move the indicator.
-        float x = m_Indicator.transform.position.x + m_MoveDirection.x;
-        float y = m_Indicator.transform.position.y;
-        float z = m_Indicator.transform.position.z + m_MoveDirection.z;
-        m_Indicator.transform.position = new Vector3(x, y, z);
     }
 }

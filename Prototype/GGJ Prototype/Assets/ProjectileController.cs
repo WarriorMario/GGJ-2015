@@ -35,8 +35,57 @@ public class ProjectileController : MonoBehaviour
             }
             else
             {
+                RaycastHit hit;
                 transform.position = m_Target;
-                Destroy(gameObject, 2f);
+
+                if (Physics.Raycast(transform.position, -transform.up, out hit, float.PositiveInfinity))
+                {
+                    // Get corners of object.
+                    Vector3[] positions = {
+                        hit.transform.position,
+                        // Corners.
+                        new Vector3(hit.transform.position.x + hit.transform.localScale.x / 2f, hit.transform.position.y, hit.transform.position.z + hit.transform.localScale.z / 2f),
+                        new Vector3(hit.transform.position.x - hit.transform.localScale.x / 2f, hit.transform.position.y, hit.transform.position.z - hit.transform.localScale.z / 2f),
+                        new Vector3(hit.transform.position.x - hit.transform.localScale.x / 2f, hit.transform.position.y, hit.transform.position.z + hit.transform.localScale.z / 2f),
+                        new Vector3(hit.transform.position.x + hit.transform.localScale.x / 2f, hit.transform.position.y, hit.transform.position.z - hit.transform.localScale.z / 2f),
+                        // Line centers.
+                        new Vector3(hit.transform.position.x + hit.transform.localScale.x / 2f, hit.transform.position.y, hit.transform.position.z),
+                        new Vector3(hit.transform.position.x - hit.transform.localScale.x / 2f, hit.transform.position.y, hit.transform.position.z),
+                        new Vector3(hit.transform.position.x, hit.transform.position.y, hit.transform.position.z + hit.transform.localScale.z / 2f),
+                        new Vector3(hit.transform.position.x, hit.transform.position.y, hit.transform.position.z - hit.transform.localScale.z / 2f)
+                    };
+                    
+                    bool playerHit = false;
+                    foreach (Vector3 position in positions)
+                    {
+                        RaycastHit hit2;
+                        if (Physics.Raycast(position, transform.up, out hit2, float.PositiveInfinity))
+                        {
+                            if (hit2.transform.gameObject.CompareTag("Player"))
+                            {
+                                hit2.transform.gameObject.GetComponent<Player>().Decay();
+                                playerHit = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!playerHit)
+                    {
+                        bool parentNotFound = true;
+                        GameObject parent = hit.transform.parent.gameObject;
+                        while (parent && parentNotFound)
+                        {
+                            Platform platform = parent.GetComponent<Platform>();
+                            if (platform)
+                            {
+                                platform.DestroyBlock(hit.transform.gameObject);
+                                break;
+                            }
+                            parent = parent.transform.parent.gameObject;
+                        }
+                    }
+                }
+                Destroy(gameObject);
             }
         }
     }
