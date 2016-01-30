@@ -62,12 +62,12 @@ public class ProjectileController : MonoBehaviour
         if (other.CompareTag("Player") && other.gameObject != m_Player)
         {
             if (!other.GetComponent<Player>().m_ProjectileSlot.Filled)
-            {
                 other.GetComponent<Player>().m_ProjectileSlot.Fill();
+            else
+                other.GetComponent<Player>().Stun();
 
-                // Destroy the projectile
-                Destroy(gameObject);
-            }
+            // Destroy the projectile
+            Destroy(gameObject);
         }
         // Collision with a block.
         if (other.CompareTag("Cube"))

@@ -3,14 +3,13 @@ using System.Collections;
 
 public class Player : MonoBehaviour
 {
-    public GameObject[] m_PlayerStates;
-
     public int m_Player;
     public float m_XSpeed;
     public float m_ZSpeed;
     public float m_ChargeTime = 1.0f;
     public float m_ProjectileSpeed = 0.1f;
     public float m_ProjectileHeight = 0.5f;
+    public float m_StunDuration;
 
     float m_PickupOffset;
     public ProjectileSlot m_ProjectileSlot;
@@ -28,6 +27,7 @@ public class Player : MonoBehaviour
     bool m_PickingUp = false;
     bool m_Charging = false;
     float m_Timer = 0.0f;
+    float m_StunTimer = 0.0f;
 
     // Use this for initialization
     void Awake()
@@ -124,16 +124,25 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (m_MoveDirection.x != 0 || m_MoveDirection.z != 0)
-        {
-            m_FaceDirection = m_MoveDirection.normalized;
-            transform.rotation = Quaternion.LookRotation(m_MoveDirection.normalized);
-        }
-        m_CharacterController.Move(m_MoveDirection);
-
         if (Floating())
         {
-            m_CharacterController.Move(-m_MoveDirection);
+            gameObject.AddComponent<Rigidbody>().useGravity = true;
+            GetComponent<Player>().enabled = false;
+            Destroy(gameObject, 10f);
+        }
+        else
+        {
+            if (m_MoveDirection.x != 0 || m_MoveDirection.z != 0)
+            {
+                m_FaceDirection = m_MoveDirection.normalized;
+                transform.rotation = Quaternion.LookRotation(m_MoveDirection.normalized);
+            }
+            m_CharacterController.Move(m_MoveDirection);
+
+            if (Floating())
+            {
+                m_CharacterController.Move(-m_MoveDirection);
+            }
         }
     }
 
@@ -193,16 +202,10 @@ public class Player : MonoBehaviour
         return false;
     }
 
-    public void Decay()
+    public void Stun()
     {
-        for (int state = 0; state < m_PlayerStates.Length; state++)
-        {
-            // Disable the first found active state.
-            if (m_PlayerStates[state].activeSelf)
-            {
-                m_PlayerStates[state].SetActive(false);
-                break;
-            }
-        }
+        // Play animation.
+
+        float m_StunTimer = m_StunDuration;
     }
 }
