@@ -28,12 +28,9 @@ public class OrbTracker : MonoBehaviour
                 transform.position += ((m_Projectile.transform.position - new Vector3(0, m_YOffset, 0)) - transform.position).normalized * m_Speed * Time.deltaTime;
                 if (((m_Projectile.transform.position - new Vector3(0, m_YOffset, 0)) - transform.position).magnitude < 0.2)
                 {
+                    transform.parent = m_Projectile.transform;
                     m_OnTarget = true;
                 }
-            }
-            else
-            {
-                transform.position = m_Projectile.transform.position - new Vector3(0, m_YOffset, 0);
             }
         }
         else if(m_WasInitialized)
