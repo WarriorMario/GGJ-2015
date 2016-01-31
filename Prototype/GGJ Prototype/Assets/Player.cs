@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     public float m_ChargeTime = 1.0f;
     public float m_ProjectileSpeed = 0.1f;
     public float m_ProjectileHeight = 0.5f;
+    public int m_Team;
 
     public ProjectileSlot m_ProjectileSlot;
     public GameObject m_BlockSelector;
@@ -29,9 +30,21 @@ public class Player : MonoBehaviour
     float m_Timer = 0.0f;
     float m_StunTimer = 0.0f;
 
+    public bool Alive { get; set; }
+
+    public Sprite[] m_Sprites;
+    public SpriteRenderer m_Mark;
+
     // Use this for initialization
     void Awake()
     {
+        Alive = true;
+        if (m_Player >= InterSceneVars.s_AmountOfPlayers)
+        {
+            Destroy(transform.parent.gameObject);
+            Alive = false;
+            return;
+        }
         m_CharacterController = GetComponent<CharacterController>();
         m_HorizontalInput += m_Player.ToString();
         m_VerticalInput += m_Player.ToString();
@@ -40,6 +53,8 @@ public class Player : MonoBehaviour
         m_FaceDirection = Vector3.forward;
         m_MoveDirection = Vector3.zero;
 
+        // Player mark
+        m_Mark.sprite = m_Sprites[m_Player];
         bool parentNotFound = true;
         GameObject parent = GetBlock().transform.parent.gameObject;
         while (parent && parentNotFound)
@@ -56,11 +71,14 @@ public class Player : MonoBehaviour
         }
 
         m_PickupOffset = GetComponent<BoxCollider>().bounds.extents.x + 1.01f;
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Fix Mark rotation
+        m_Mark.transform.LookAt(Camera.main.transform.position, -Vector3.up);
         if (m_StunTimer > 0)
         {
             m_MoveDirection = Vector3.zero;
@@ -134,7 +152,12 @@ public class Player : MonoBehaviour
         if (Floating())
         {
             GetComponent<Player>().enabled = false;
-            Destroy(gameObject, 1f);
+
+            // Do animation....
+
+            Alive = false;
+            CheckForDeath.access.OnPlayerDeath();
+            transform.parent.gameObject.SetActive(false);
         }
         else
         {

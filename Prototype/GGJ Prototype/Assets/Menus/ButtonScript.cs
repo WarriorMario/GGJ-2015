@@ -88,29 +88,32 @@ public class ButtonScript : MonoBehaviour
                 break;
             case ButtonType.ONEVSONE:
                 {
-                    InterSceneVars.m_AmountOfPlayers = 2;
+                    InterSceneVars.s_AmountOfPlayers = 2;
                     m_Manager.ActivateLevelSelection();
                 }
                 break;
             case ButtonType.TWOVSTWO:
                 {
-                    InterSceneVars.m_AmountOfPlayers = 4;
+                    InterSceneVars.s_AmountOfPlayers = 4;
                     m_Manager.ActivateLevelSelection();
                 }
                 break;
             case ButtonType.LEVEL1:
                 {
-                    SceneManager.LoadScene("Level1");
+                    InterSceneVars.s_Level = "Level1";
+                    SceneManager.LoadScene(InterSceneVars.s_Level);
                 }
                 break;
             case ButtonType.LEVEL2:
                 {
-                    SceneManager.LoadScene("Level2");
+                    InterSceneVars.s_Level = "Level2";
+                    SceneManager.LoadScene(InterSceneVars.s_Level);
                 }
                 break;
             case ButtonType.LEVEL3:
                 {
-                    SceneManager.LoadScene("Level3");
+                    InterSceneVars.s_Level = "Level3";
+                    SceneManager.LoadScene(InterSceneVars.s_Level);
                 }
                 break;
         }
