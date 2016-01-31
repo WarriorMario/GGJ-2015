@@ -26,12 +26,11 @@ public class OrbTracker : MonoBehaviour
             if (!m_OnTarget)
             {
                 transform.position += ((m_Projectile.transform.position - new Vector3(0, m_YOffset, 0)) - transform.position).normalized * m_Speed * Time.deltaTime;
-                if (((m_Projectile.transform.position - new Vector3(0, m_YOffset, 0)) - transform.position).magnitude < 0.2)
-                {
-                    transform.parent = m_Projectile.transform;
+                if (((m_Projectile.transform.position - new Vector3(0, m_YOffset, 0)) - transform.position).magnitude < 0.2f)
                     m_OnTarget = true;
-                }
             }
+            else
+                Destroy(this.gameObject);
         }
         else if(m_WasInitialized)
         {

@@ -33,8 +33,8 @@ public class ProjectileSlot : MonoBehaviour
         if (Filled)
         {
             m_Projectile.transform.SetParent(null);
-            m_Projectile.GetComponent<ProjectileController>().Fire(target,transform.parent.GetComponent<Player>());
-
+            m_Projectile.GetComponent<ProjectileController>().Fire(target, transform.parent.GetComponent<Player>());
+            
             Filled = false;
         }
     }
