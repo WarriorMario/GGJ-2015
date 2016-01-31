@@ -9,12 +9,12 @@ public class Player : MonoBehaviour
     public float m_ChargeTime = 1.0f;
     public float m_ProjectileSpeed = 0.1f;
     public float m_ProjectileHeight = 0.5f;
-    public float m_StunDuration;
 
-    float m_PickupOffset;
     public ProjectileSlot m_ProjectileSlot;
     public GameObject m_BlockSelector;
-    public GameObject m_GatherEffectPrefab;
+
+    public GameObject m_StunEffectPrefab;
+    public float m_StunDuration;
 
     CharacterController m_CharacterController;
     Vector3 m_FaceDirection;
@@ -23,7 +23,7 @@ public class Player : MonoBehaviour
     string m_VerticalInput = "Vertical";
     string m_PickupInput = "Pickup";
 
-    GameObject m_ChargeEffect;
+    float m_PickupOffset;
     bool m_PickingUp = false;
     bool m_Charging = false;
     float m_Timer = 0.0f;
@@ -61,64 +61,71 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!m_Charging)
+        if (m_StunTimer > 0)
         {
-            if (Mathf.Abs(Input.GetAxis(m_HorizontalInput)) > Mathf.Abs(Input.GetAxis(m_VerticalInput)))
-            {
-                m_MoveDirection = new Vector3(Input.GetAxis(m_HorizontalInput) * m_XSpeed, 0, 0);
-            }
-            else
-            {
-                m_MoveDirection = new Vector3(0, 0, Input.GetAxis(m_VerticalInput) * m_ZSpeed);
-            }
+            m_MoveDirection = Vector3.zero;
+            m_StunTimer -= Time.deltaTime;
         }
-
-        GameObject marked = MarkForwardBlock();
-        // Pickup.
-        if (marked != null && !m_ProjectileSlot.Filled && m_Charging == false)
+        else
         {
-            if (Input.GetButtonDown(m_PickupInput) && !m_PickingUp)
+            if (!m_Charging)
             {
-                m_MoveDirection = Vector3.zero;
-                m_Charging = true;
-                m_Timer = 0;
-
-                // Spawn effect.
-                //m_ProjectileSlot.Fill();
-            }
-        }
-
-        if (m_Charging)
-        {
-            m_Timer += Time.deltaTime;
-            if (m_Timer >= m_ChargeTime)
-            {
-                m_Timer = 0;
-                m_PickingUp = true;
-                m_Charging = false;
-            }
-        }
-        else if (m_PickingUp)
-        {
-            m_BlockSelector.SetActive(false);
-            marked.GetComponent<Rigidbody>().useGravity = true;
-            marked.GetComponent<BoxCollider>().enabled = false;
-
-            bool parentNotFound = true;
-            GameObject parent = marked.transform.parent.gameObject;
-            while (parent && parentNotFound)
-            {
-                Platform platform = parent.GetComponent<Platform>();
-                if (platform)
+                if (Mathf.Abs(Input.GetAxis(m_HorizontalInput)) > Mathf.Abs(Input.GetAxis(m_VerticalInput)))
                 {
-                    platform.DestroyBlock(marked);
-                    break;
+                    m_MoveDirection = new Vector3(Input.GetAxis(m_HorizontalInput) * m_XSpeed, 0, 0);
                 }
-                parent = parent.transform.parent.gameObject;
+                else
+                {
+                    m_MoveDirection = new Vector3(0, 0, Input.GetAxis(m_VerticalInput) * m_ZSpeed);
+                }
             }
-            m_ProjectileSlot.Fill();
 
-            m_PickingUp = false;
+            GameObject marked = MarkForwardBlock();
+            // Pickup.
+            if (marked != null && !m_ProjectileSlot.Filled && m_Charging == false)
+            {
+                if (Input.GetButtonDown(m_PickupInput) && !m_PickingUp)
+                {
+                    m_MoveDirection = Vector3.zero;
+                    m_Charging = true;
+                    m_Timer = 0;
+
+                    m_ProjectileSlot.Charge(marked.transform.position);
+                }
+            }
+
+            if (m_Charging)
+            {
+                m_Timer += Time.deltaTime;
+                if (m_Timer >= m_ChargeTime)
+                {
+                    m_Timer = 0;
+                    m_PickingUp = true;
+                    m_Charging = false;
+                }
+            }
+            else if (m_PickingUp)
+            {
+                m_BlockSelector.SetActive(false);
+                marked.GetComponent<Rigidbody>().useGravity = true;
+                marked.GetComponent<BoxCollider>().enabled = false;
+
+                bool parentNotFound = true;
+                GameObject parent = marked.transform.parent.gameObject;
+                while (parent && parentNotFound)
+                {
+                    Platform platform = parent.GetComponent<Platform>();
+                    if (platform)
+                    {
+                        platform.DestroyBlock(marked);
+                        break;
+                    }
+                    parent = parent.transform.parent.gameObject;
+                }
+                m_ProjectileSlot.Fill();
+
+                m_PickingUp = false;
+            }
         }
     }
 
@@ -204,7 +211,8 @@ public class Player : MonoBehaviour
     public void Stun()
     {
         // Play animation.
-
-        float m_StunTimer = m_StunDuration;
+        GameObject obj = Instantiate(m_StunEffectPrefab, transform.position, transform.rotation) as GameObject;
+        Destroy(obj, m_StunDuration);
+        m_StunTimer = m_StunDuration;
     }
 }
